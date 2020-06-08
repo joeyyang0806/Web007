@@ -55,7 +55,7 @@ public class HttpClientUtil {
 	}
 	
 	
-	public static boolean getBase2ResponseString() throws UnsupportedEncodingException {
+	public static boolean getBase2ResponseString() throws Exception, IOException {
 		List<NameValuePair> list = new ArrayList<NameValuePair>();
 		list.add(new BasicNameValuePair("loginname", "admin01"));
 		list.add(new BasicNameValuePair("pwd", "Dtt!234567890"));
@@ -64,13 +64,25 @@ public class HttpClientUtil {
 		RequestConfig config = RequestConfig.custom().setConnectTimeout(5000).setConnectionRequestTimeout(5000).setSocketTimeout(5000).build();
 		HttpPost post = new HttpPost();
 		post.setURI(URI.create("http://10.173.20.44:10010/BASE/randd/ibizutil/login.do"));
+		post.setEntity(entity);
+		post.setConfig(config);
 		
+		HttpClient client = new DefaultHttpClient();
+		HttpResponse response = client.execute(post);
 		
+		if(response.getStatusLine().getStatusCode()==200) {
+			HttpEntity res= response.getEntity();
+			String resStr = EntityUtils.toString(res, "UTF-8");
+			JSONObject json = JSON.parseObject(resStr);
+			if(json.getString("isSa").equals("1")) {
+				return true;
+			}
+		}
 		return false;
 	}
-	public static void main(String args[]) throws ClientProtocolException, IOException {
+	public static void main(String args[]) throws Exception {
 		boolean meetError = getBase1ReponseString();
-		
+		meetError = getBase2ResponseString();
 		
 	}
 }
