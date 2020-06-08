@@ -3,6 +3,7 @@ package com.detector.util;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.http.HttpEntity;
+import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
@@ -10,8 +11,11 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.conn.routing.HttpRoute;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
@@ -89,5 +93,24 @@ public class HttpClientUtil {
     private static RequestConfig requestConfig = null;
     private static int maxConnection = 10;
     private static int defaultMaxConnection = 5;
+    private static String ip = "http://172.16.150.162:8080/BASE/randd/ibizutil/login.do";
+    private static int port = -1;
+
+    static {
+    	requestConfig = RequestConfig.custom().setConnectionRequestTimeout(5000).setConnectTimeout(5000).setSocketTimeout(5000).build();
+		HttpHost host = new HttpHost(ip, port);
+		connectionManager = new PoolingHttpClientConnectionManager();
+		connectionManager.setMaxTotal(maxConnection);
+		connectionManager.setDefaultMaxPerRoute(defaultMaxConnection);
+		connectionManager.setMaxPerRoute(new HttpRoute(host), 20);
+		clientBuilder = HttpClients.custom();
+		clientBuilder.setConnectionManager(connectionManager);
+	}
+
+	public static CloseableHttpClient getConnection() {
+        CloseableHttpClient client = clientBuilder.build();
+        return client;
+    }
+
 
 }
