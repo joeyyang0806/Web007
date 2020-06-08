@@ -83,6 +83,6 @@ public class HttpClientUtil {
 	public static void main(String args[]) throws Exception {
 		boolean meetError = getBase1ReponseString();
 		meetError = getBase2ResponseString();
-		
+		add some error;
 	}
 }
